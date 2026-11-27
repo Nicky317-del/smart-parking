@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark Pro | Parking Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">P</span>
+            <div>
+                <h2>SmartPark</h2>
+                <small>SMART PARKING SYSTEM</small>
+            </div>
+        </div>
+
+        <p class="menu-heading">MAIN MENU</p>
+
+        <nav>
+            <a href="#" class="nav-link active" data-page="dashboard">
+                <span>▦</span> Dashboard
+            </a>
+            <a href="#" class="nav-link" data-page="vehicles">
+                <span>🚘</span> Vehicles
+            </a>
+            <a href="#" class="nav-link" data-page="payments">
+                <span>💳</span> Payments
+            </a>
+            <a href="#" class="nav-link" data-page="reports">
+                <span>📊</span> Reports & Analytics
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                System Online
+            </div>
+            <small>SmartPark Pro v1.0</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2 id="page-heading">Dashboard Overview</h2>
+                <p>Welcome to your SmartPark management system.</p>
+            </div>
+            <div class="topbar-right">
+                <span id="current-date"></span>
+                <button id="refreshBtn" class="refresh-btn">↻ Refresh</button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard-page" class="page-section active">
+
+            <div class="section-heading">
+                <div>
+                    <h3>Parking Overview</h3>
+                    <p>Monitor your parking facility in real time.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">P</div>
+                    <p>Total Parking Slots</p>
+                    <h2 id="totalSlots">0</h2>
+                    <small>Registered parking spaces</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">✓</div>
+                    <p>Available Slots</p>
+                    <h2 id="availableSlots">0</h2>
+                    <small>Currently available</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">●</div>
+                    <p>Occupied Slots</p>
+                    <h2 id="occupiedSlots">0</h2>
+                    <small>Currently occupied</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">▤</div>
+                    <p>Total Reservations</p>
+                    <h2 id="totalReservations">0</h2>
+                    <small>Recorded reservations</small>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="panel chart-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Parking Occupancy</h3>
+                            <p>Available versus occupied spaces</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="occupancyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Quick Information</h3>
+                            <p>System summary</p>
+                        </div>
+                    </div>
+                    <div class="quick-info">
+                        <div><span>Parking System</span><strong>Active</strong></div>
+                        <div><span>Database</span><strong>Connected</strong></div>
+                        <div><span>Cloud Storage</span><strong>MongoDB Atlas</strong></div>
+                        <div><span>Application</span><strong>SmartPark Pro</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel parking-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Parking Slot Management</h3>
+                        <p>View the current status of parking spaces.</p>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="slotSearch" placeholder="Search parking slot...">
+                    <select id="slotFilter">
+                        <option value="all">All Slots</option>
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                    </select>
+                </div>
+
+                <div id="parkingGrid" class="parking-grid">
+                    <p>Loading parking slots...</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Recent Reservations</h3>
+                        <p>Latest parking reservations</p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reservation ID</th>
+                                <th>User ID</th>
+                                <th>Slot ID</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationTable">
+                            <tr><td colspan="4">Loading reservations...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VEHICLES -->
+        <section id="vehicles-page" class="page-section">
+
+            <div class="section-heading">
+                <div>
+                    <h3>Vehicle Management</h3>
+                    <p>Register, manage and track customer vehicles.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">🚘</div>
+                    <p>Total Registered Vehicles</p>
+                    <h2 id="vehicleCount">0</h2>
+                    <small>Vehicles in the database</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">✓</div>
+                    <p>Vehicle Management</p>
+                    <h2>Active</h2>
+                    <small>Vehicle records available</small>
+                </div>
+            </div>
+
+            <!-- ADD NEW USER -->
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Add New User</h3>
+                        <p>Register a customer before adding their vehicle.</p>
+                    </div>
+                </div>
+
+                <form id="userForm" class="vehicle-form">
+
+                    <div class="form-group">
+                        <label for="newUserName">Full Name *</label>
+                        <input type="text" id="newUserName"
+                               placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newUserEmail">Email *</label>
+                        <input type="email" id="newUserEmail"
+                               placeholder="Enter email address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newUserPhone">Phone *</label>
+                        <input type="tel" id="newUserPhone"
+                               placeholder="Enter phone number" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="primary-btn" id="addUserBtn">
+                            Add User
+                        </button>
+                    </div>
+                </form>
+
+                <p id="userMessage" role="status"></p>
+            </div>
+
+            <!-- REGISTER VEHICLE -->
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3 id="vehicleFormTitle">Register New Vehicle</h3>
+                        <p>Select an existing user and enter vehicle information.</p>
+                    </div>
+                </div>
+
+                <form id="vehicleForm" class="vehicle-form">
+
+                    <input type="hidden" id="vehicleId">
+
+                    <div class="form-group">
+                        <label for="vehicleUserId">Vehicle Owner *</label>
+                        <select id="vehicleUserId" required>
+                            <option value="">Loading users...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registrationNumber">Registration Number *</label>
+                        <input type="text" id="registrationNumber"
+                               placeholder="e.g. HR26AB1234" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type *</label>
+                        <select id="vehicleType" required>
+                            <option value="">Select vehicle type</option>
+                            <option value="Car">Car</option>
+                            <option value="Bike">Bike</option>
+                            <option value="Scooter">Scooter</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleBrand">Brand</label>
+                        <input type="text" id="vehicleBrand" placeholder="e.g. Hyundai">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleModel">Model</label>
+                        <input type="text" id="vehicleModel" placeholder="e.g. Creta">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleColor">Color</label>
+                        <input type="text" id="vehicleColor" placeholder="e.g. White">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="vehicleSubmitBtn" class="primary-btn">
+                            Add Vehicle
+                        </button>
+                        <button type="button" id="cancelVehicleEdit" class="secondary-btn">
+                            Clear
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- REGISTERED VEHICLES -->
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Registered Vehicles</h3>
+                        <p>Manage all registered vehicles.</p>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="vehicleSearch"
+                           placeholder="Search registration number...">
+                    <select id="vehicleFilter">
+                        <option value="all">All Vehicle Types</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                        <option value="scooter">Scooter</option>
+                        <option value="suv">SUV</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vehicle ID</th>
+                                <th>User ID</th>
+                                <th>Registration Number</th>
+                                <th>Type</th>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Color</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleTable">
+                            <tr><td colspan="8">Loading vehicles...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAYMENTS -->
+        <section id="payments-page" class="page-section">
+
+            <div class="section-heading">
+                <div>
+                    <h3>Payment Management</h3>
+                    <p>Monitor transactions and payment records.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">₹</div>
+                    <p>Total Payments</p>
+                    <h2 id="paymentCount">0</h2>
+                    <small>Recorded transactions</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">₹</div>
+                    <p>Total Revenue</p>
+                    <h2 id="totalRevenue">₹0</h2>
+                    <small>Successful payments</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">◷</div>
+                    <p>Pending Payments</p>
+                    <h2 id="pendingPayments">0</h2>
+                    <small>Awaiting payment</small>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Payment Transactions</h3>
+                        <p>View and filter payment records.</p>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="paymentSearch"
+                           placeholder="Search transaction ID...">
+                    <select id="paymentFilter">
+                        <option value="all">All Payment Statuses</option>
+                        <option value="success">Success</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Reservation ID</th>
+                                <th>User ID</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Transaction ID</th>
+                                <th>Status</th>
+                                <th>Payment Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentTable">
+                            <tr><td colspan="8">Payment records will appear here.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="reports-page" class="page-section">
+
+            <div class="section-heading">
+                <div>
+                    <h3>Reports & Analytics</h3>
+                    <p>Analyze parking operations and financial performance.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">P</div>
+                    <p>Total Parking Slots</p>
+                    <h2 id="reportSlots">0</h2>
+                    <small>Parking capacity</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">🚘</div>
+                    <p>Registered Vehicles</p>
+                    <h2 id="reportVehicles">0</h2>
+                    <small>Vehicle records</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">▤</div>
+                    <p>Total Reservations</p>
+                    <h2 id="reportReservations">0</h2>
+                    <small>Reservation records</small>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">₹</div>
+                    <p>Total Revenue</p>
+                    <h2 id="reportRevenue">₹0</h2>
+                    <small>Successful payments</small>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h3>Generate System Report</h3>
+                        <p>Choose a report to view or export.</p>
+                    </div>
+                </div>
+
+                <div class="report-actions">
+                    <button id="generateReportBtn" class="primary-btn">
+                        Generate Report
+                    </button>
+                    <button id="printReportBtn" class="secondary-btn">
+                        Print Report
+                    </button>
+                </div>
+
+                <div id="reportOutput" class="report-output">
+                    Your system report will appear here.
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            © 2026 SmartPark Pro. Smart Parking Management System.
+        </footer>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
